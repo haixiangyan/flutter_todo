@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/screens/home.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,17 +23,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        body: Container(
-          child: Center(
-            child: Image(
-              image: AssetImage(
-                'assets/images/logo.png'
-              )
-            )
-          )
-        )
-      )
+      home: Home(),
     );
   }
 }
