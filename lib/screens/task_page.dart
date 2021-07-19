@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/models/task.dart';
+import 'package:flutter_todo/utils/db_helper.dart';
 import 'package:flutter_todo/widgets/Todo.dart';
 
-class Task extends StatefulWidget {
-  const Task({Key? key}) : super(key: key);
+class TaskPage extends StatefulWidget {
+  const TaskPage({Key? key}) : super(key: key);
 
   @override
-  _TaskState createState() => _TaskState();
+  _TaskPageState createState() => _TaskPageState();
 }
 
-class _TaskState extends State<Task> {
+class _TaskPageState extends State<TaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +41,15 @@ class _TaskState extends State<Task> {
                         ),
                         Expanded(
                           child: TextField(
+                            onSubmitted: (value) async {
+                              if (value != '') {
+                                DBHelper _dbHelper = DBHelper();
+                                Task _newTask = Task(title: value);
+                                await _dbHelper.insertTask(_newTask);
+
+                                print('New task has been created');
+                              }
+                            },
                             decoration: InputDecoration(
                               hintText: 'Enter task title...',
                               border: InputBorder.none,
@@ -78,7 +89,7 @@ class _TaskState extends State<Task> {
                 right: 24.0,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Task()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TaskPage()));
                   },
                   child: Container(
                       width: 60.0,

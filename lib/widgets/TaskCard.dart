@@ -37,7 +37,7 @@ class TaskCardWidget extends StatelessWidget {
               top: 16.0
             ),
             child: Text(
-              desc ?? 'Enter your description here.',
+              desc ?? 'No description added',
               style: TextStyle(
                 color: Color(0xFF86829D),
                 fontSize: 16.0,

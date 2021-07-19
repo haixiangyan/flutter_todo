@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/screens/task.dart';
+import 'package:flutter_todo/models/task.dart';
+import 'package:flutter_todo/screens/task_page.dart';
+import 'package:flutter_todo/utils/db_helper.dart';
 import 'package:flutter_todo/widgets/TaskCard.dart';
 
 import '../widgets/NoGlowBehavior.dart';
 
-class Home extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> {
+class _HomePageState extends State<HomePage> {
+  DBHelper _dbHelper = DBHelper();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,17 +35,22 @@ class _HomeState extends State<Home> {
                     )
                   ),
                   Expanded(
-                    child: ScrollConfiguration(
-                      behavior: NoGlowBehavior(),
-                      child: ListView(
-                        children: [
-                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                        ]
-                      ),
+                    child: FutureBuilder(
+                      future: _dbHelper.getTasks(),
+                      builder: (context, AsyncSnapshot<List<Task>> snapshot) {
+                        return ScrollConfiguration(
+                          behavior: NoGlowBehavior(),
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return TaskCardWidget(
+                                title: snapshot.data![index].title,
+                                desc: snapshot.data![index].desc,
+                              );
+                            },
+                          ),
+                        );
+                      },
                     )
                   )
                 ]
@@ -51,7 +60,11 @@ class _HomeState extends State<Home> {
                 right: 0.0,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Task()));
+                    Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => TaskPage())
+                    ).then((value) {
+                      setState(() {}); // 更新状态
+                    });
                   },
                   child: Container(
                     width: 60.0,
