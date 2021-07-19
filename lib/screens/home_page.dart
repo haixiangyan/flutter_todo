@@ -43,9 +43,19 @@ class _HomePageState extends State<HomePage> {
                           child: ListView.builder(
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
-                              return TaskCardWidget(
-                                title: snapshot.data![index].title,
-                                desc: snapshot.data![index].desc,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => TaskPage(
+                                      task: snapshot.data![index]
+                                    ))
+                                  );
+                                },
+                                child: TaskCardWidget(
+                                  title: snapshot.data![index].title,
+                                  desc: snapshot.data![index].desc,
+                                ),
                               );
                             },
                           ),
@@ -61,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => TaskPage())
+                      context, MaterialPageRoute(builder: (context) => TaskPage(task: null))
                     ).then((value) {
                       setState(() {}); // 更新状态
                     });

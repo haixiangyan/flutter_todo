@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class Todo extends StatelessWidget {
+class TodoWidget extends StatelessWidget {
   final String? text;
   final bool isDone;
 
-  const Todo({this.text, required this.isDone});
+  const TodoWidget({this.text, required this.isDone});
 
   @override
   Widget build(BuildContext context) {
