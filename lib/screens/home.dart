@@ -14,9 +14,7 @@ class _HomeState extends State<Home> {
       body: SafeArea(
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: 24.0,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 24.0),
           color: Color(0xFFF6F6F6),
           child: Stack(
             children: [
