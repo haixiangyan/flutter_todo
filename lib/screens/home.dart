@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todo/screens/task.dart';
 import 'package:flutter_todo/widgets/TaskCard.dart';
 
-import 'NoGlowBehavior.dart';
+import '../widgets/NoGlowBehavior.dart';
 
 class Home extends StatefulWidget {
   @override
