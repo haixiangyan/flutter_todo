@@ -52,7 +52,11 @@ class _HomeState extends State<Home> {
                     width: 60.0,
                     height: 60.0,
                     decoration: BoxDecoration(
-                      color: Color(0xFF7349FE),
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF7349FE), Color(0xFF643FDB)],
+                        begin: Alignment(0.0, -1.0),
+                        end: Alignment(0.0, 1.0),
+                      ),
                       borderRadius: BorderRadius.circular(50.0)
                     ),
                     child: Image(image: AssetImage('assets/images/add_icon.png'))
