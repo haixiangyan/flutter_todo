@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/screens/task.dart';
 import 'package:flutter_todo/widgets/TaskCard.dart';
 
 class Home extends StatefulWidget {
@@ -45,14 +46,19 @@ class _HomeState extends State<Home> {
               Positioned(
                 bottom: 24.0,
                 right: 0.0,
-                child: Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF7349FE),
-                    borderRadius: BorderRadius.circular(50.0)
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Task()));
+                  },
+                  child: Container(
+                    width: 60.0,
+                    height: 60.0,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF7349FE),
+                      borderRadius: BorderRadius.circular(50.0)
+                    ),
+                    child: Image(image: AssetImage('assets/images/add_icon.png'))
                   ),
-                  child: Image(image: AssetImage('assets/images/add_icon.png'))
                 )
               )
             ],
