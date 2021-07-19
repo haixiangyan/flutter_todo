@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todo/screens/task.dart';
 import 'package:flutter_todo/widgets/TaskCard.dart';
 
+import 'NoGlowBehavior.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -29,15 +31,18 @@ class _HomeState extends State<Home> {
                     )
                   ),
                   Expanded(
+                    child: ScrollConfiguration(
+                      behavior: NoGlowBehavior(),
                       child: ListView(
-                          children: [
-                            TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                            TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                            TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                            TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                            TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
-                          ]
-                      )
+                        children: [
+                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
+                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
+                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
+                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
+                          TaskCardWidget(title: 'Get Stated', desc: 'Hello'),
+                        ]
+                      ),
+                    )
                   )
                 ]
               ),
