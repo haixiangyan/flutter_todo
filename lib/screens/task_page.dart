@@ -18,15 +18,33 @@ class _TaskPageState extends State<TaskPage> {
 
   int _taskId = 0;
   String _taskTitle = '';
+  String _taskDesc = '';
+
+  FocusNode _titleFocus = FocusNode();
+  FocusNode _descFocus = FocusNode();
+  FocusNode _todoFocus = FocusNode();
+
+  bool _contentVisible = false;
 
   @override
   void initState() {
     if (widget.task != null) {
-      _taskTitle = widget.task!.title!;
-      _taskId = widget.task!.id!;
+      _contentVisible = true;
+
+      _taskTitle = widget.task!.title ?? '';
+      _taskDesc = widget.task!.desc ?? '';
+      _taskId = widget.task!.id ?? 0;
     }
 
     super.initState();
+  }
+
+  @override void dispose() {
+    _titleFocus.dispose();
+    _descFocus.dispose();
+    _todoFocus.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -59,13 +77,24 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         Expanded(
                           child: TextField(
+                            focusNode: _titleFocus,
                             onSubmitted: (value) async {
                               if (value != '') {
                                 if (widget.task == null) {
                                   Task _newTask = Task(title: value);
-                                  await _dbHelper.insertTask(_newTask);
+                                  _taskId = await _dbHelper.insertTask(_newTask);
+                                  print('New taskId: $_taskId');
+
+                                  setState(() {
+                                    _contentVisible = true;
+                                    _taskTitle = value;
+                                  });
                                 } else {
+                                  _dbHelper.updateTaskTitle(_taskId, value);
+                                  print('Update title');
                                 }
+
+                                _descFocus.requestFocus();
                               }
                             },
                             controller: TextEditingController()..text = _taskTitle,
@@ -83,108 +112,139 @@ class _TaskPageState extends State<TaskPage> {
                       ]
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: 12.0
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter description for the task...',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 24.0
-                        )
+                  Visibility(
+                    visible: _contentVisible,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: 12.0
+                      ),
+                      child: TextField(
+                        focusNode: _descFocus,
+                        controller: TextEditingController()..text = _taskDesc,
+                        onSubmitted: (value) async {
+                          if (value != '') {
+                            if (_taskId != 0) {
+                              await _dbHelper.updateTaskDesc(_taskId, value);
+                              _taskDesc = value;
+                            }
+                          }
+                          _todoFocus.requestFocus();
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter description for the task...',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 24.0
+                          )
+                        ),
                       ),
                     ),
                   ),
-                  FutureBuilder(
-                    future: _dbHelper.getTodos(_taskId),
-                    builder: (context, AsyncSnapshot<List<Todo>> snapshot) {
-                      return Expanded(
-                        child: ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                // Switch status
-                              },
-                              child: TodoWidget(
-                                text: snapshot.data![index].title,
-                                isDone: snapshot.data![index].isDone != 0,
-                              ),
-                            );
-                          }
-                        ),
-                      );
-                    }
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20.0,
-                          height: 20.0,
-                          margin: EdgeInsets.only(
-                              right: 12.0
-                          ),
-                          decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(6.0),
-                              border: Border.all(
-                                color: Color(0xFF86829D),
-                                width: 1.5,
-                              )
-                          ),
-                          child: Image(
-                              image: AssetImage('assets/images/check_icon.png')
-                          ),
-                        ),
-                        Expanded(
-                          child: TextField(
-                            onSubmitted: (value) async {
-                              if (value != '') {
-                                if (widget.task != null) {
-                                  Todo _newTodo = Todo(
-                                      taskId: widget.task!.id,
-                                      title: value,
-                                      isDone: 0
-                                  );
-                                  await _dbHelper.insertTodo(_newTodo);
+                  Visibility(
+                    visible: _contentVisible,
+                    child: FutureBuilder(
+                      future: _dbHelper.getTodos(_taskId),
+                      builder: (context, AsyncSnapshot<List<Todo>> snapshot) {
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount: snapshot.data == null ? 0 : snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  final todo = snapshot.data![index];
+                                  await _dbHelper.updateTodoIsDone(todo.id!, todo.isDone == 0 ? 1 : 0);
                                   setState(() {});
-                                }
-                              }
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Enter todo item...',
-                              border: InputBorder.none,
+                                },
+                                child: TodoWidget(
+                                  text: snapshot.data![index].title,
+                                  isDone: snapshot.data![index].isDone != 0,
+                                ),
+                              );
+                            }
+                          ),
+                        );
+                      }
+                    ),
+                  ),
+                  Visibility(
+                    visible: _contentVisible,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.0,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20.0,
+                            height: 20.0,
+                            margin: EdgeInsets.only(
+                                right: 12.0
                             ),
+                            decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(6.0),
+                                border: Border.all(
+                                  color: Color(0xFF86829D),
+                                  width: 1.5,
+                                )
+                            ),
+                            child: Image(
+                                image: AssetImage('assets/images/check_icon.png')
+                            ),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              focusNode: _todoFocus,
+                              controller: TextEditingController()..text = '',
+                              onSubmitted: (value) async {
+                                if (value != '') {
+                                  if (_taskId != 0) {
+                                    Todo _newTodo = Todo(
+                                        taskId: _taskId,
+                                        title: value,
+                                        isDone: 0
+                                    );
+                                    await _dbHelper.insertTodo(_newTodo);
+                                    setState(() {});
+                                    _todoFocus.requestFocus();
+                                  }
+                                }
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Enter todo item...',
+                                border: InputBorder.none,
+                              ),
+                            )
                           )
-                        )
-                      ],
+                        ],
+                      ),
                     ),
                   )
                 ]
               ),
-              Positioned(
-                bottom: 24.0,
-                right: 24.0,
-                child: GestureDetector(
-                  onTap: () {
-                    print('delete');
-                  },
-                  child: Container(
-                      width: 60.0,
-                      height: 60.0,
-                      decoration: BoxDecoration(
-                          color: Color(0xFFFE3577),
-                          borderRadius: BorderRadius.circular(50.0)
-                      ),
-                      child: Image(image: AssetImage('assets/images/delete_icon.png'))
-                  ),
-                )
+              Visibility(
+                visible: _contentVisible,
+                child: Positioned(
+                  bottom: 24.0,
+                  right: 24.0,
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (_taskId != 0) {
+                        await _dbHelper.deleteTask(_taskId);
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Container(
+                        width: 60.0,
+                        height: 60.0,
+                        decoration: BoxDecoration(
+                            color: Color(0xFFFE3577),
+                            borderRadius: BorderRadius.circular(50.0)
+                        ),
+                        child: Image(image: AssetImage('assets/images/delete_icon.png'))
+                    ),
+                  )
+                ),
               )
             ],
           )
